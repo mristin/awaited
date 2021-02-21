@@ -57,7 +57,7 @@ Usage
 =====
 We present here the interface of the library and show how it is meant to be used.
 
-``awaited.that`` awaits a coroutine and applies a function on the awaited result:
+``awaited.then`` awaits a coroutine and applies a function on the awaited result:
 
 .. code-block:: python
 
@@ -67,11 +67,11 @@ We present here the interface of the library and show how it is meant to be used
     ...     return [1, 2, 3]
 
     # some_func() gives a coroutine!
-    >>> awaited_sum = await awaited.that(sum, some_func())
+    >>> awaited_sum = await awaited.then(some_func(), sum)
     6
 
-``awaited.these`` awaits each item of a sync iterable of *awaitables* and
-applies a function on the result *async* iterable of awaited items.
+``awaited.these`` awaits each item of a sync iterable of *awaitables* resulting
+in an async iterable of awaited items:
 
 .. code-block:: python
 
@@ -80,11 +80,9 @@ applies a function on the result *async* iterable of awaited items.
     >>> async def async_is_non_negative(x: int) -> bool:
     ...     return x > 0
 
-    >>> all_non_negative = await awaited.these(
-    ...     asyncstdlib.all,
-    ...     # Awaiting each individual item in this iterable will convert it into
-    ...     # async iterable -- hence we need to use asyncstdlib.all.
-    ...     (async_is_non_negative(x) for x in [1, 2, 3]))
+    >>> all_non_negative = await asyncstdlib.all(
+    ...     awaited.these(
+    ...         async_is_non_negative(x) for x in [1, 2, 3]))
     True
 
 Installation

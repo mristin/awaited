@@ -7,11 +7,11 @@ import awaited
 
 
 @pytest.mark.asyncio
-async def test_that():
+async def test_then():
     async def async_func() -> List[int]:
         return [1, 2, 3]
 
-    awaited_sum = await awaited.that(all, async_func())
+    awaited_sum = await awaited.then(async_func(), sum)
     assert awaited_sum == 6
 
 
@@ -20,11 +20,9 @@ async def test_these_on_sync_iterable():
     async def async_is_non_negative(x: int) -> bool:
         return x > 0
 
-    result = await awaited.these(
-        asyncstdlib.all,
-        # Awaiting each individual item in this iterable will convert it into
-        # async iterable -- hence we need to use asyncstdlib.all.
-        (async_is_non_negative(x) for x in [1, 2, 3]))
+    result = await asyncstdlib.all(
+        awaited.these(
+            async_is_non_negative(x) for x in [1, 2, 3]))
 
     assert result
 
